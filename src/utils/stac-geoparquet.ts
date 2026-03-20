@@ -15,6 +15,7 @@ import type { StacItemCollection } from "../types/stac";
 export const SUPPORTED_GEOMETRY_TYPES = [
   "point",
   "polygon",
+  "multipolygon",
   "linestring",
 ] as const;
 
@@ -170,6 +171,20 @@ export async function fetchStacGeoparquetTable({
     table.schema.fields[0].metadata.set(
       "ARROW:extension:name",
       "geoarrow.polygon"
+    );
+  } else if (geometryType === "multipolygon") {
+    const multipolygons = io.parseWkb(
+      wkbData,
+      io.WKBType.MultiPolygon,
+      2
+    );
+    table = new Table({
+      geometry: makeVector(multipolygons),
+      id: vectorFromArray(result.getChild("id")?.toArray()),
+    });
+    table.schema.fields[0].metadata.set(
+      "ARROW:extension:name",
+      "geoarrow.multipolygon"
     );
   } else if (geometryType === "point") {
     const points = io.parseWkb(wkbData, io.WKBType.Point, 2) as data.PointData;
