@@ -177,7 +177,7 @@ export async function fetchStacGeoparquetTable({
       wkbData,
       io.WKBType.MultiPolygon,
       2
-    );
+    ) as data.MultiPolygonData;
     table = new Table({
       geometry: makeVector(multipolygons),
       id: vectorFromArray(result.getChild("id")?.toArray()),
@@ -264,7 +264,7 @@ async function fetchStacGeoparquetDatetimeColumns(
     ? "start_datetime"
     : "datetime";
   const endDatetimeColumnName = columnNames.includes("end_datetime")
-    ? "start_datetime"
+    ? "end_datetime"
     : "datetime";
   return { startDatetimeColumnName, endDatetimeColumnName };
 }
