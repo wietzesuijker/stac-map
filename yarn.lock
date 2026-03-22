@@ -923,9 +923,9 @@
     proj4 "^2.9.2"
     threads "^1.7.0"
 
-"@geoarrow/geoarrow-js@github:smohiudd/geoarrow-js#feature/wkb":
+"@geoarrow/geoarrow-js@github:wietzesuijker/geoarrow-js#feature/wkb":
   version "0.3.1"
-  resolved "https://codeload.github.com/smohiudd/geoarrow-js/tar.gz/58cd5ad74d60692ce4df18ca15536ada3062258a"
+  resolved "https://codeload.github.com/wietzesuijker/geoarrow-js/tar.gz/63a1ff6b8b4f290c2e4263d2baf12e9bd1f15ce2"
   dependencies:
     "@math.gl/polygon" "^4.0.0"
     proj4 "^2.9.2"
