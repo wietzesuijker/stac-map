@@ -235,9 +235,33 @@ export async function fetchStacGeoparquetItem({
     select: "* REPLACE ST_AsGeoJSON(geometry) as geometry",
     where: `id = '${id}'`,
   });
-  const item = stacWasm.arrowToStacJson(result)[0];
-  item.geometry = JSON.parse(item.geometry);
-  return item;
+
+  // Try stac-wasm first (for stac-geoparquet files with full STAC schema).
+  // Fall back to raw properties for plain GeoParquet (e.g. crown polygons).
+  try {
+    const item = stacWasm.arrowToStacJson(result)[0];
+    item.geometry = JSON.parse(item.geometry);
+    return item;
+  } catch {
+    const raw = result.toArray()[0]?.toJSON();
+    if (!raw) return null;
+    // Convert BigInt values to Number (DuckDB Int64 → JS BigInt)
+    const row = Object.fromEntries(
+      Object.entries(raw).map(([k, v]) => [k, typeof v === "bigint" ? Number(v) : v])
+    );
+    const geometry = JSON.parse(row.geometry as string);
+    const { geometry: _, id: itemId, bbox, ...properties } = row;
+    return {
+      type: "Feature",
+      stac_version: "1.0.0",
+      id: itemId ?? id,
+      geometry,
+      bbox: bbox ? [bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax] : undefined,
+      properties,
+      links: [],
+      assets: {},
+    };
+  }
 }
 
 async function fetchStacGeoparquetDatetimeColumns(
